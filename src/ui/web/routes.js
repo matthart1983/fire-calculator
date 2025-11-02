@@ -4,6 +4,9 @@ import SuperannuationCalculator from '../../calculators/superannuationCalculator
 import NetWorthCalculator from '../../calculators/netWorthCalculator.js';
 import SavingsCalculator from '../../calculators/savingsCalculator.js';
 import LoanCalculator from '../../calculators/loanCalculator.js';
+import MortgageVsRentCalculator from '../../calculators/mortgageVsRentCalculator.js';
+import InvestmentPortfolioCalculator from '../../calculators/investmentPortfolioCalculator.js';
+import RetirementIncomeCalculator from '../../calculators/retirementIncomeCalculator.js';
 
 const router = express.Router();
 const calculator = new FireCalculator();
@@ -11,6 +14,9 @@ const superCalculator = new SuperannuationCalculator();
 const netWorthCalculator = new NetWorthCalculator();
 const savingsCalculator = new SavingsCalculator();
 const loanCalculator = new LoanCalculator();
+const mortgageVsRentCalculator = new MortgageVsRentCalculator();
+const portfolioCalculator = new InvestmentPortfolioCalculator();
+const retirementIncomeCalculator = new RetirementIncomeCalculator();
 
 router.get('/savings-goal', (req, res) => {
     try {
@@ -163,11 +169,11 @@ router.post('/savings/required-contribution', (req, res) => {
 
 router.post('/loan/calculate', (req, res) => {
     try {
-        const { loanAmount, annualInterestRate, loanTermYears, paymentFrequency } = req.body;
+        const { loanAmount, interestRate, loanTerm, paymentFrequency } = req.body;
         const result = loanCalculator.calculateLoanRepayment(
             Number(loanAmount),
-            Number(annualInterestRate) / 100,
-            Number(loanTermYears),
+            Number(interestRate) / 100,
+            Number(loanTerm),
             paymentFrequency || 'monthly'
         );
         res.json(result);
@@ -200,6 +206,225 @@ router.post('/loan/extra-payment-impact', (req, res) => {
             Number(loanTermYears),
             Number(extraPayment),
             paymentFrequency || 'monthly'
+        );
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// Mortgage vs Rent Calculator Routes
+router.post('/mortgage-vs-rent/compare', (req, res) => {
+    try {
+        const {
+            propertyPrice,
+            deposit,
+            mortgageRate,
+            mortgageTerm,
+            monthlyRent,
+            rentIncreaseRate,
+            propertyAppreciationRate,
+            investmentReturnRate,
+            years
+        } = req.body;
+
+        const result = mortgageVsRentCalculator.calculateComparison(
+            Number(propertyPrice),
+            Number(deposit),
+            Number(mortgageRate) / 100,
+            Number(mortgageTerm),
+            Number(monthlyRent),
+            rentIncreaseRate ? Number(rentIncreaseRate) / 100 : undefined,
+            propertyAppreciationRate ? Number(propertyAppreciationRate) / 100 : undefined,
+            investmentReturnRate ? Number(investmentReturnRate) / 100 : undefined,
+            years ? Number(years) : undefined
+        );
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/mortgage-vs-rent/affordability', (req, res) => {
+    try {
+        const { annualIncome, monthlyDebts, deposit, interestRate } = req.body;
+        const result = mortgageVsRentCalculator.calculateAffordability(
+            Number(annualIncome),
+            Number(monthlyDebts),
+            Number(deposit),
+            interestRate ? Number(interestRate) / 100 : undefined
+        );
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// Investment Portfolio Calculator Routes
+router.post('/portfolio/growth', (req, res) => {
+    try {
+        const {
+            initialInvestment,
+            monthlyContribution,
+            allocation,
+            expectedReturns,
+            years,
+            inflationRate
+        } = req.body;
+
+        const result = portfolioCalculator.calculatePortfolioGrowth(
+            Number(initialInvestment),
+            Number(monthlyContribution),
+            allocation,
+            expectedReturns,
+            years ? Number(years) : undefined,
+            inflationRate ? Number(inflationRate) / 100 : undefined
+        );
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/portfolio/optimize-allocation', (req, res) => {
+    try {
+        const { age, retirementAge, riskTolerance } = req.body;
+        const result = portfolioCalculator.optimizeAllocation(
+            Number(age),
+            Number(retirementAge),
+            riskTolerance
+        );
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/portfolio/rebalance', (req, res) => {
+    try {
+        const { currentAllocation, targetAllocation } = req.body;
+        const result = portfolioCalculator.calculateRebalancing(
+            currentAllocation,
+            targetAllocation
+        );
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/portfolio/tax-efficient-withdrawal', (req, res) => {
+    try {
+        const { portfolioValue, annualWithdrawal, allocation, capitalGainsTaxRate } = req.body;
+        const result = portfolioCalculator.calculateTaxEfficientWithdrawal(
+            Number(portfolioValue),
+            Number(annualWithdrawal),
+            allocation,
+            capitalGainsTaxRate ? Number(capitalGainsTaxRate) / 100 : undefined
+        );
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/portfolio/dca-vs-lumpsum', (req, res) => {
+    try {
+        const { totalAmount, monthlyAmount, expectedReturn, volatility, years } = req.body;
+        const result = portfolioCalculator.calculateDCAvsLumpSum(
+            Number(totalAmount),
+            Number(monthlyAmount),
+            expectedReturn ? Number(expectedReturn) / 100 : undefined,
+            volatility ? Number(volatility) / 100 : undefined,
+            years ? Number(years) : undefined
+        );
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// Retirement Income Calculator Routes
+router.post('/retirement/safe-withdrawal', (req, res) => {
+    try {
+        const {
+            portfolioValue,
+            annualExpenses,
+            yearsInRetirement,
+            expectedReturn,
+            inflationRate,
+            successRate
+        } = req.body;
+
+        const result = retirementIncomeCalculator.calculateSafeWithdrawal(
+            Number(portfolioValue),
+            Number(annualExpenses),
+            yearsInRetirement ? Number(yearsInRetirement) : undefined,
+            expectedReturn ? Number(expectedReturn) / 100 : undefined,
+            inflationRate ? Number(inflationRate) / 100 : undefined,
+            successRate ? Number(successRate) / 100 : undefined
+        );
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/retirement/age-pension', (req, res) => {
+    try {
+        const { age, assessableAssets, annualIncome, isCouple, isHomeowner } = req.body;
+        const result = retirementIncomeCalculator.calculateAgePension(
+            Number(age),
+            Number(assessableAssets),
+            Number(annualIncome),
+            isCouple,
+            isHomeowner
+        );
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/retirement/annuity-vs-account', (req, res) => {
+    try {
+        const {
+            superBalance,
+            annuityRate,
+            investmentReturn,
+            yearsInRetirement,
+            inflationRate
+        } = req.body;
+
+        const result = retirementIncomeCalculator.compareAnnuityVsAccountBased(
+            Number(superBalance),
+            annuityRate ? Number(annuityRate) / 100 : undefined,
+            investmentReturn ? Number(investmentReturn) / 100 : undefined,
+            yearsInRetirement ? Number(yearsInRetirement) : undefined,
+            inflationRate ? Number(inflationRate) / 100 : undefined
+        );
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/retirement/total-income', (req, res) => {
+    try {
+        const {
+            superBalance,
+            otherInvestments,
+            rentalIncome,
+            age,
+            agePensionDetails
+        } = req.body;
+
+        const result = retirementIncomeCalculator.calculateTotalRetirementIncome(
+            Number(superBalance),
+            Number(otherInvestments),
+            Number(rentalIncome),
+            Number(age),
+            agePensionDetails
         );
         res.json(result);
     } catch (error) {

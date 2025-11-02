@@ -53,10 +53,11 @@ class LoanCalculator {
 
         return {
             loanAmount: Math.round(loanAmount),
-            payment: Math.round(payment * 100) / 100,
-            totalPayments: totalPayments,
-            totalPaid: Math.round(totalPaid),
+            paymentAmount: Math.round(payment * 100) / 100,
+            numberOfPayments: totalPayments,
+            totalPayments: Math.round(totalPaid),
             totalInterest: Math.round(totalInterest),
+            totalCost: Math.round(totalPaid),
             paymentFrequency: paymentFrequency,
             interestRate: annualInterestRate * 100,
             loanTermYears: loanTermYears,
