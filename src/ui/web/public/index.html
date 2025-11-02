@@ -154,12 +154,15 @@
         <p class="subtitle">Financial Independence, Retire Early & Superannuation Planning</p>
         
         <!-- Tab Navigation -->
-        <div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;">
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap;">
             <button onclick="showTab('fire')" id="fireTab" style="width: auto; padding: 12px 30px; background: white; color: #667eea; border: 2px solid #667eea;">
                 FIRE Calculator
             </button>
             <button onclick="showTab('super')" id="superTab" style="width: auto; padding: 12px 30px; background: transparent; color: white; border: 2px solid white;">
                 Super Calculator
+            </button>
+            <button onclick="showTab('networth')" id="networthTab" style="width: auto; padding: 12px 30px; background: transparent; color: white; border: 2px solid white;">
+                Net Worth
             </button>
         </div>
         
@@ -301,6 +304,114 @@
                     <h3 style="margin-bottom: 15px; color: #333;">Contribution Breakdown</h3>
                     <div class="chart-container">
                         <canvas id="superPieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Net Worth Calculator Section -->
+        <div id="networthSection" style="display: none;">
+            <div class="card">
+                <h2 style="margin-bottom: 20px; color: #333;">Net Worth Calculator</h2>
+                
+                <h3 style="color: #667eea; margin-bottom: 15px;">Assets</h3>
+                <div class="input-group">
+                    <label for="cashSavings">Cash & Savings ($)</label>
+                    <input type="number" id="cashSavings" placeholder="50000" value="50000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="investments">Investments ($)</label>
+                    <input type="number" id="investments" placeholder="100000" value="100000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="superAsset">Superannuation ($)</label>
+                    <input type="number" id="superAsset" placeholder="150000" value="150000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="realEstate">Real Estate ($)</label>
+                    <input type="number" id="realEstate" placeholder="600000" value="600000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="vehicles">Vehicles ($)</label>
+                    <input type="number" id="vehicles" placeholder="30000" value="30000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="otherAssets">Other Assets ($)</label>
+                    <input type="number" id="otherAssets" placeholder="20000" value="20000">
+                </div>
+                
+                <h3 style="color: #e74c3c; margin-top: 25px; margin-bottom: 15px;">Liabilities</h3>
+                <div class="input-group">
+                    <label for="mortgage">Mortgage ($)</label>
+                    <input type="number" id="mortgage" placeholder="400000" value="400000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="carLoans">Car Loans ($)</label>
+                    <input type="number" id="carLoans" placeholder="15000" value="15000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="creditCards">Credit Cards ($)</label>
+                    <input type="number" id="creditCards" placeholder="5000" value="5000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="studentLoans">Student Loans ($)</label>
+                    <input type="number" id="studentLoans" placeholder="0" value="0">
+                </div>
+                
+                <div class="input-group">
+                    <label for="personalLoans">Personal Loans ($)</label>
+                    <input type="number" id="personalLoans" placeholder="0" value="0">
+                </div>
+                
+                <div class="input-group">
+                    <label for="otherDebts">Other Debts ($)</label>
+                    <input type="number" id="otherDebts" placeholder="0" value="0">
+                </div>
+                
+                <button onclick="calculateNetWorth()">Calculate Net Worth</button>
+                
+                <div class="results" id="networthResults" style="display: none;">
+                    <div class="result-box" style="background: linear-gradient(135deg, #50c878 0%, #45b068 100%);">
+                        <div class="result-label">Net Worth</div>
+                        <div class="result-value" id="netWorthValue">$0</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Total Assets</div>
+                        <div class="result-value" id="totalAssets">$0</div>
+                    </div>
+                    <div class="result-box" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
+                        <div class="result-label">Total Liabilities</div>
+                        <div class="result-value" id="totalLiabilities">$0</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Debt-to-Asset Ratio</div>
+                        <div class="result-value" id="debtRatio">0%</div>
+                    </div>
+                </div>
+                
+                <p class="info-text">Track all your assets and liabilities to monitor your financial health.</p>
+            </div>
+            
+            <div class="grid-container">
+                <div class="card">
+                    <h3 style="margin-bottom: 15px; color: #333;">Assets Breakdown</h3>
+                    <div class="chart-container">
+                        <canvas id="assetsChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 style="margin-bottom: 15px; color: #333;">Liabilities Breakdown</h3>
+                    <div class="chart-container">
+                        <canvas id="liabilitiesChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -478,23 +589,37 @@
         function showTab(tab) {
             const fireSection = document.getElementById('fireSection');
             const superSection = document.getElementById('superSection');
+            const networthSection = document.getElementById('networthSection');
             const fireTab = document.getElementById('fireTab');
             const superTab = document.getElementById('superTab');
+            const networthTab = document.getElementById('networthTab');
             
+            // Hide all sections
+            fireSection.style.display = 'none';
+            superSection.style.display = 'none';
+            networthSection.style.display = 'none';
+            
+            // Reset all tabs
+            fireTab.style.background = 'transparent';
+            fireTab.style.color = 'white';
+            superTab.style.background = 'transparent';
+            superTab.style.color = 'white';
+            networthTab.style.background = 'transparent';
+            networthTab.style.color = 'white';
+            
+            // Show selected tab
             if (tab === 'fire') {
                 fireSection.style.display = 'block';
-                superSection.style.display = 'none';
                 fireTab.style.background = 'white';
                 fireTab.style.color = '#667eea';
-                superTab.style.background = 'transparent';
-                superTab.style.color = 'white';
-            } else {
-                fireSection.style.display = 'none';
+            } else if (tab === 'super') {
                 superSection.style.display = 'block';
-                fireTab.style.background = 'transparent';
-                fireTab.style.color = 'white';
                 superTab.style.background = 'white';
                 superTab.style.color = '#667eea';
+            } else if (tab === 'networth') {
+                networthSection.style.display = 'block';
+                networthTab.style.background = 'white';
+                networthTab.style.color = '#667eea';
             }
         }
         
@@ -629,6 +754,169 @@
                             '#667eea',
                             '#50c878',
                             '#e74c3c',
+                            '#95a5a6'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = formatCurrency(context.parsed);
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return label + ': ' + value + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Net Worth calculator
+        let assetsChart = null;
+        let liabilitiesChart = null;
+        
+        async function calculateNetWorth() {
+            const assets = {
+                'Cash & Savings': parseFloat(document.getElementById('cashSavings').value) || 0,
+                'Investments': parseFloat(document.getElementById('investments').value) || 0,
+                'Superannuation': parseFloat(document.getElementById('superAsset').value) || 0,
+                'Real Estate': parseFloat(document.getElementById('realEstate').value) || 0,
+                'Vehicles': parseFloat(document.getElementById('vehicles').value) || 0,
+                'Other Assets': parseFloat(document.getElementById('otherAssets').value) || 0
+            };
+            
+            const liabilities = {
+                'Mortgage': parseFloat(document.getElementById('mortgage').value) || 0,
+                'Car Loans': parseFloat(document.getElementById('carLoans').value) || 0,
+                'Credit Cards': parseFloat(document.getElementById('creditCards').value) || 0,
+                'Student Loans': parseFloat(document.getElementById('studentLoans').value) || 0,
+                'Personal Loans': parseFloat(document.getElementById('personalLoans').value) || 0,
+                'Other Debts': parseFloat(document.getElementById('otherDebts').value) || 0
+            };
+            
+            try {
+                const response = await fetch('/api/networth/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ assets, liabilities })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Update results
+                    document.getElementById('netWorthValue').textContent = formatCurrency(data.netWorth);
+                    document.getElementById('totalAssets').textContent = formatCurrency(data.totalAssets);
+                    document.getElementById('totalLiabilities').textContent = formatCurrency(data.totalLiabilities);
+                    document.getElementById('debtRatio').textContent = data.debtToAssetRatio.toFixed(1) + '%';
+                    document.getElementById('networthResults').style.display = 'grid';
+                    
+                    // Update charts
+                    updateAssetsChart(data.assetBreakdown);
+                    updateLiabilitiesChart(data.liabilityBreakdown);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error calculating net worth: ' + error.message);
+            }
+        }
+        
+        function updateAssetsChart(assetBreakdown) {
+            const ctx = document.getElementById('assetsChart').getContext('2d');
+            
+            if (assetsChart) {
+                assetsChart.destroy();
+            }
+            
+            const labels = Object.keys(assetBreakdown);
+            const data = labels.map(label => assetBreakdown[label].amount);
+            
+            assetsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#667eea',
+                            '#764ba2',
+                            '#4a90e2',
+                            '#50c878',
+                            '#f59e0b',
+                            '#8b5cf6'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = formatCurrency(context.parsed);
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return label + ': ' + value + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateLiabilitiesChart(liabilityBreakdown) {
+            const ctx = document.getElementById('liabilitiesChart').getContext('2d');
+            
+            if (liabilitiesChart) {
+                liabilitiesChart.destroy();
+            }
+            
+            const labels = Object.keys(liabilityBreakdown);
+            const data = labels.map(label => liabilityBreakdown[label].amount);
+            
+            if (data.length === 0 || data.reduce((a, b) => a + b, 0) === 0) {
+                // No liabilities, show a message
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#666';
+                ctx.fillText('No liabilities - Great job! 🎉', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
+            liabilitiesChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#e74c3c',
+                            '#c0392b',
+                            '#e67e22',
+                            '#d35400',
+                            '#f39c12',
                             '#95a5a6'
                         ],
                         borderWidth: 0

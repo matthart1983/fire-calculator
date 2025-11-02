@@ -1,10 +1,12 @@
 import express from 'express';
 import FireCalculator from '../../calculators/fireCalculator.js';
 import SuperannuationCalculator from '../../calculators/superannuationCalculator.js';
+import NetWorthCalculator from '../../calculators/netWorthCalculator.js';
 
 const router = express.Router();
 const calculator = new FireCalculator();
 const superCalculator = new SuperannuationCalculator();
+const netWorthCalculator = new NetWorthCalculator();
 
 router.get('/savings-goal', (req, res) => {
     try {
@@ -79,6 +81,31 @@ router.post('/superannuation/required-contributions', (req, res) => {
         );
 
         res.json({ requiredPersonalContributionRate: requiredRate });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/networth/calculate', (req, res) => {
+    try {
+        const { assets, liabilities } = req.body;
+        const result = netWorthCalculator.calculateNetWorth(assets, liabilities);
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/networth/projection', (req, res) => {
+    try {
+        const { currentNetWorth, monthlySavings, investmentReturn, years } = req.body;
+        const projection = netWorthCalculator.projectNetWorthGrowth(
+            Number(currentNetWorth),
+            Number(monthlySavings),
+            investmentReturn ? Number(investmentReturn) / 100 : undefined,
+            Number(years) || 10
+        );
+        res.json({ projection });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
