@@ -2,11 +2,13 @@ import express from 'express';
 import FireCalculator from '../../calculators/fireCalculator.js';
 import SuperannuationCalculator from '../../calculators/superannuationCalculator.js';
 import NetWorthCalculator from '../../calculators/netWorthCalculator.js';
+import SavingsCalculator from '../../calculators/savingsCalculator.js';
 
 const router = express.Router();
 const calculator = new FireCalculator();
 const superCalculator = new SuperannuationCalculator();
 const netWorthCalculator = new NetWorthCalculator();
+const savingsCalculator = new SavingsCalculator();
 
 router.get('/savings-goal', (req, res) => {
     try {
@@ -106,6 +108,52 @@ router.post('/networth/projection', (req, res) => {
             Number(years) || 10
         );
         res.json({ projection });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/savings/calculate', (req, res) => {
+    try {
+        const { initialBalance, monthlyContribution, annualInterestRate, years, compoundingFrequency } = req.body;
+        const result = savingsCalculator.calculateSavingsGrowth(
+            Number(initialBalance),
+            Number(monthlyContribution),
+            Number(annualInterestRate) / 100,
+            Number(years),
+            compoundingFrequency || 'monthly'
+        );
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/savings/time-to-goal', (req, res) => {
+    try {
+        const { initialBalance, targetAmount, monthlyContribution, annualInterestRate } = req.body;
+        const result = savingsCalculator.calculateTimeToGoal(
+            Number(initialBalance),
+            Number(targetAmount),
+            Number(monthlyContribution),
+            Number(annualInterestRate) / 100
+        );
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/savings/required-contribution', (req, res) => {
+    try {
+        const { initialBalance, targetAmount, years, annualInterestRate } = req.body;
+        const requiredContribution = savingsCalculator.calculateRequiredContribution(
+            Number(initialBalance),
+            Number(targetAmount),
+            Number(years),
+            Number(annualInterestRate) / 100
+        );
+        res.json({ requiredContribution });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }

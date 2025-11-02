@@ -164,6 +164,9 @@
             <button onclick="showTab('networth')" id="networthTab" style="width: auto; padding: 12px 30px; background: transparent; color: white; border: 2px solid white;">
                 Net Worth
             </button>
+            <button onclick="showTab('savings')" id="savingsTab" style="width: auto; padding: 12px 30px; background: transparent; color: white; border: 2px solid white;">
+                Savings
+            </button>
         </div>
         
         <!-- FIRE Calculator Section -->
@@ -416,6 +419,82 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Savings Calculator Section -->
+        <div id="savingsSection" style="display: none;">
+            <div class="card">
+                <h2 style="margin-bottom: 20px; color: #333;">Savings Growth Calculator</h2>
+                
+                <div class="input-group">
+                    <label for="savingsInitial">Initial Balance ($)</label>
+                    <input type="number" id="savingsInitial" placeholder="10000" value="10000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="savingsMonthly">Monthly Contribution ($)</label>
+                    <input type="number" id="savingsMonthly" placeholder="500" value="500">
+                </div>
+                
+                <div class="input-group">
+                    <label for="savingsRate">Annual Interest Rate (%)</label>
+                    <input type="number" id="savingsRate" placeholder="3" value="3" step="0.1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="savingsYears">Time Period (years)</label>
+                    <input type="number" id="savingsYears" placeholder="10" value="10">
+                </div>
+                
+                <div class="input-group">
+                    <label for="compoundingFreq">Compounding Frequency</label>
+                    <select id="compoundingFreq" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
+                        <option value="daily">Daily</option>
+                        <option value="monthly" selected>Monthly</option>
+                        <option value="quarterly">Quarterly</option>
+                        <option value="annually">Annually</option>
+                    </select>
+                </div>
+                
+                <button onclick="calculateSavings()">Calculate Savings</button>
+                
+                <div class="results" id="savingsResults" style="display: none;">
+                    <div class="result-box">
+                        <div class="result-label">Final Balance</div>
+                        <div class="result-value" id="savingsFinalBalance">$0</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Total Contributions</div>
+                        <div class="result-value" id="savingsTotalContributions">$0</div>
+                    </div>
+                    <div class="result-box" style="background: linear-gradient(135deg, #50c878 0%, #45b068 100%);">
+                        <div class="result-label">Total Interest Earned</div>
+                        <div class="result-value" id="savingsTotalInterest">$0</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Effective Rate</div>
+                        <div class="result-value" id="savingsEffectiveRate">0%</div>
+                    </div>
+                </div>
+                
+                <p class="info-text">See how your savings grow with regular contributions and compound interest.</p>
+            </div>
+            
+            <div class="grid-container">
+                <div class="card">
+                    <h3 style="margin-bottom: 15px; color: #333;">Savings Growth Over Time</h3>
+                    <div class="chart-container">
+                        <canvas id="savingsGrowthChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 style="margin-bottom: 15px; color: #333;">Balance Composition</h3>
+                    <div class="chart-container">
+                        <canvas id="savingsCompositionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -590,14 +669,17 @@
             const fireSection = document.getElementById('fireSection');
             const superSection = document.getElementById('superSection');
             const networthSection = document.getElementById('networthSection');
+            const savingsSection = document.getElementById('savingsSection');
             const fireTab = document.getElementById('fireTab');
             const superTab = document.getElementById('superTab');
             const networthTab = document.getElementById('networthTab');
+            const savingsTab = document.getElementById('savingsTab');
             
             // Hide all sections
             fireSection.style.display = 'none';
             superSection.style.display = 'none';
             networthSection.style.display = 'none';
+            savingsSection.style.display = 'none';
             
             // Reset all tabs
             fireTab.style.background = 'transparent';
@@ -606,6 +688,8 @@
             superTab.style.color = 'white';
             networthTab.style.background = 'transparent';
             networthTab.style.color = 'white';
+            savingsTab.style.background = 'transparent';
+            savingsTab.style.color = 'white';
             
             // Show selected tab
             if (tab === 'fire') {
@@ -620,6 +704,10 @@
                 networthSection.style.display = 'block';
                 networthTab.style.background = 'white';
                 networthTab.style.color = '#667eea';
+            } else if (tab === 'savings') {
+                savingsSection.style.display = 'block';
+                savingsTab.style.background = 'white';
+                savingsTab.style.color = '#667eea';
             }
         }
         
@@ -918,6 +1006,163 @@
                             '#d35400',
                             '#f39c12',
                             '#95a5a6'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = formatCurrency(context.parsed);
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return label + ': ' + value + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Savings calculator
+        let savingsGrowthChart = null;
+        let savingsCompositionChart = null;
+        
+        async function calculateSavings() {
+            const initialBalance = parseFloat(document.getElementById('savingsInitial').value) || 0;
+            const monthlyContribution = parseFloat(document.getElementById('savingsMonthly').value) || 0;
+            const annualInterestRate = parseFloat(document.getElementById('savingsRate').value) || 0;
+            const years = parseFloat(document.getElementById('savingsYears').value) || 0;
+            const compoundingFreq = document.getElementById('compoundingFreq').value;
+            
+            try {
+                const response = await fetch('/api/savings/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        initialBalance,
+                        monthlyContribution,
+                        annualInterestRate,
+                        years,
+                        compoundingFrequency: compoundingFreq
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Update results
+                    document.getElementById('savingsFinalBalance').textContent = formatCurrency(data.finalBalance);
+                    document.getElementById('savingsTotalContributions').textContent = formatCurrency(data.totalContributions);
+                    document.getElementById('savingsTotalInterest').textContent = formatCurrency(data.totalInterest);
+                    document.getElementById('savingsEffectiveRate').textContent = data.effectiveRate.toFixed(2) + '%';
+                    document.getElementById('savingsResults').style.display = 'grid';
+                    
+                    // Update charts
+                    updateSavingsGrowthChart(data.yearlyData);
+                    updateSavingsCompositionChart(data.initialBalance, data.totalContributions, data.totalInterest);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error calculating savings: ' + error.message);
+            }
+        }
+        
+        function updateSavingsGrowthChart(yearlyData) {
+            const ctx = document.getElementById('savingsGrowthChart').getContext('2d');
+            
+            if (savingsGrowthChart) {
+                savingsGrowthChart.destroy();
+            }
+            
+            const years = yearlyData.map(d => d.year);
+            const balances = yearlyData.map(d => d.balance);
+            const contributions = yearlyData.map(d => d.totalContributions);
+            
+            savingsGrowthChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [
+                        {
+                            label: 'Total Balance',
+                            data: balances,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Total Contributions',
+                            data: contributions,
+                            borderColor: '#764ba2',
+                            backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Years'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Amount ($)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value / 1000).toFixed(0) + 'k';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateSavingsCompositionChart(initial, contributions, interest) {
+            const ctx = document.getElementById('savingsCompositionChart').getContext('2d');
+            
+            if (savingsCompositionChart) {
+                savingsCompositionChart.destroy();
+            }
+            
+            savingsCompositionChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Initial Balance', 'Contributions', 'Interest Earned'],
+                    datasets: [{
+                        data: [initial, contributions, interest],
+                        backgroundColor: [
+                            '#764ba2',
+                            '#667eea',
+                            '#50c878'
                         ],
                         borderWidth: 0
                     }]
