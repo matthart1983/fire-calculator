@@ -285,9 +285,13 @@
                         <div class="result-label">Investment Returns</div>
                         <div class="result-value" id="superTotalReturns">$0</div>
                     </div>
+                    <div class="result-box" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
+                        <div class="result-label">Total Tax Paid</div>
+                        <div class="result-value" id="superTotalTax">$0</div>
+                    </div>
                 </div>
                 
-                <p class="info-text">Projection includes employer contributions, personal contributions, investment returns, and fees.</p>
+                <p class="info-text">Projection includes 12% tax on contributions, 15% tax on earnings, plus fees. All figures after tax.</p>
             </div>
             
             <div class="grid-container">
@@ -536,6 +540,7 @@
                     document.getElementById('superFinalBalance').textContent = formatCurrency(data.finalBalance);
                     document.getElementById('superTotalContributions').textContent = formatCurrency(data.totalContributions);
                     document.getElementById('superTotalReturns').textContent = formatCurrency(data.totalReturns);
+                    document.getElementById('superTotalTax').textContent = formatCurrency(data.totalTax);
                     document.getElementById('superResults').style.display = 'grid';
                     
                     // Update charts
@@ -616,19 +621,23 @@
             superPieChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Current Super', 'Employer Contributions', 'Personal Contributions', 'Investment Returns'],
+                    labels: ['Current Super', 'Employer Contributions', 'Personal Contributions', 'Investment Returns', 'Tax Paid', 'Fees Paid'],
                     datasets: [{
                         data: [
                             data.currentSuper,
                             data.totalEmployerContributions,
                             data.totalPersonalContributions,
-                            data.totalReturns
+                            data.totalReturns,
+                            data.totalTax,
+                            data.totalFees
                         ],
                         backgroundColor: [
                             '#764ba2',
                             '#667eea',
                             '#4a90e2',
-                            '#50c878'
+                            '#50c878',
+                            '#e74c3c',
+                            '#95a5a6'
                         ],
                         borderWidth: 0
                     }]

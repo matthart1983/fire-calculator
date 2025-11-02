@@ -2,6 +2,37 @@ class SuperannuationCalculator {
     constructor() {
         // Default superannuation guarantee rate (as of 2025)
         this.defaultSGRate = 0.115; // 11.5%
+        // Tax rates for superannuation
+        this.contributionsTaxRate = 0.12; // 12% on concessional contributions
+        this.earningsTaxRate = 0.15; // 15% on fund earnings
+        this.medicareLevyRate = 0.02; // 2% Medicare levy
+    }
+
+    /**
+     * Calculate Australian income tax based on 2024-25 tax brackets
+     * @param {number} income - Annual taxable income
+     * @returns {number} Total income tax including Medicare levy
+     */
+    calculateIncomeTax(income) {
+        let tax = 0;
+        
+        // 2024-25 Australian tax brackets
+        if (income <= 18200) {
+            tax = 0;
+        } else if (income <= 45000) {
+            tax = (income - 18200) * 0.19;
+        } else if (income <= 135000) {
+            tax = 5092 + (income - 45000) * 0.325;
+        } else if (income <= 190000) {
+            tax = 34342 + (income - 135000) * 0.37;
+        } else {
+            tax = 54692 + (income - 190000) * 0.45;
+        }
+        
+        // Add Medicare levy (2%)
+        const medicareLevy = income * this.medicareLevyRate;
+        
+        return tax + medicareLevy;
     }
 
     /**
@@ -36,9 +67,6 @@ class SuperannuationCalculator {
         let balance = currentSuper;
         const yearlyData = [];
         
-        // Net return rate after fees
-        const netReturnRate = returnRate - feeRate;
-        
         // Calculate annual employer contribution
         let employerContribution = annualIncome * employerContributionRate;
         let personalContribution = annualIncome * personalContributionRate;
@@ -48,34 +76,51 @@ class SuperannuationCalculator {
         let totalPersonalContributions = 0;
         let totalReturns = 0;
         let totalFees = 0;
+        let totalContributionsTax = 0;
+        let totalEarningsTax = 0;
 
         for (let year = 0; year < years; year++) {
             const currentYear = currentAge + year;
             
-            // Calculate returns for the year
-            const yearReturn = balance * netReturnRate;
+            // Apply contributions tax (15% on concessional contributions - employer + salary sacrifice)
+            const contributionsTax = (employerContribution + personalContribution) * this.contributionsTaxRate;
+            const netEmployerContribution = employerContribution * (1 - this.contributionsTaxRate);
+            const netPersonalContribution = personalContribution * (1 - this.contributionsTaxRate);
+            
+            // Add net contributions to balance
+            balance += netEmployerContribution + netPersonalContribution;
+            
+            // Calculate gross returns for the year
+            const grossYearReturn = balance * returnRate;
+            
+            // Apply earnings tax (15% on investment returns)
+            const earningsTax = grossYearReturn * this.earningsTaxRate;
+            const netYearReturn = grossYearReturn * (1 - this.earningsTaxRate);
+            
+            // Apply fees
             const yearFees = balance * feeRate;
             
-            // Add contributions
-            balance += employerContribution + personalContribution;
-            
-            // Apply returns
-            balance += yearReturn;
+            // Add net returns and deduct fees
+            balance += netYearReturn - yearFees;
             
             // Track totals
-            totalEmployerContributions += employerContribution;
-            totalPersonalContributions += personalContribution;
-            totalReturns += yearReturn;
+            totalEmployerContributions += netEmployerContribution;
+            totalPersonalContributions += netPersonalContribution;
+            totalReturns += netYearReturn;
             totalFees += yearFees;
+            totalContributionsTax += contributionsTax;
+            totalEarningsTax += earningsTax;
             
             // Store yearly data
             yearlyData.push({
                 age: currentYear + 1,
                 balance: Math.round(balance),
-                employerContribution: Math.round(employerContribution),
-                personalContribution: Math.round(personalContribution),
-                returns: Math.round(yearReturn),
-                fees: Math.round(yearFees)
+                employerContribution: Math.round(netEmployerContribution),
+                personalContribution: Math.round(netPersonalContribution),
+                returns: Math.round(netYearReturn),
+                fees: Math.round(yearFees),
+                contributionsTax: Math.round(contributionsTax),
+                earningsTax: Math.round(earningsTax)
             });
             
             // Apply wage growth (inflation) for next year
@@ -91,6 +136,9 @@ class SuperannuationCalculator {
             totalPersonalContributions: Math.round(totalPersonalContributions),
             totalReturns: Math.round(totalReturns),
             totalFees: Math.round(totalFees),
+            totalContributionsTax: Math.round(totalContributionsTax),
+            totalEarningsTax: Math.round(totalEarningsTax),
+            totalTax: Math.round(totalContributionsTax + totalEarningsTax),
             totalContributions: Math.round(totalEmployerContributions + totalPersonalContributions),
             years: years,
             yearlyData: yearlyData,
@@ -99,7 +147,9 @@ class SuperannuationCalculator {
                 inflationRate: inflationRate * 100,
                 feeRate: feeRate * 100,
                 employerContributionRate: employerContributionRate * 100,
-                personalContributionRate: personalContributionRate * 100
+                personalContributionRate: personalContributionRate * 100,
+                contributionsTaxRate: this.contributionsTaxRate * 100,
+                earningsTaxRate: this.earningsTaxRate * 100
             }
         };
     }
