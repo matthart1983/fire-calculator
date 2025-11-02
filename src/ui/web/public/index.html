@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIRE Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .result-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+        }
+        
+        .result-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        .result-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 20px;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+        
+        .info-text {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 FIRE Calculator</h1>
+        <p class="subtitle">Financial Independence, Retire Early</p>
+        
+        <div class="card">
+            <h2 style="margin-bottom: 20px; color: #333;">Calculate Your Path to FIRE</h2>
+            
+            <div class="input-group">
+                <label for="monthlyExpenses">Monthly Expenses ($)</label>
+                <input type="number" id="monthlyExpenses" placeholder="5000" value="5000">
+            </div>
+            
+            <div class="input-group">
+                <label for="withdrawalRate">Safe Withdrawal Rate (%)</label>
+                <input type="number" id="withdrawalRate" placeholder="4" value="4" step="0.1">
+            </div>
+            
+            <div class="input-group">
+                <label for="currentSavings">Current Savings ($)</label>
+                <input type="number" id="currentSavings" placeholder="100000" value="100000">
+            </div>
+            
+            <div class="input-group">
+                <label for="monthlySavings">Monthly Savings ($)</label>
+                <input type="number" id="monthlySavings" placeholder="2000" value="2000">
+            </div>
+            
+            <div class="input-group">
+                <label for="expectedReturn">Expected Annual Return (%)</label>
+                <input type="number" id="expectedReturn" placeholder="7" value="7" step="0.1">
+            </div>
+            
+            <button onclick="calculate()">Calculate FIRE Number</button>
+            
+            <div class="results" id="results" style="display: none;">
+                <div class="result-box">
+                    <div class="result-label">FIRE Number</div>
+                    <div class="result-value" id="fireNumber">$0</div>
+                </div>
+                <div class="result-box">
+                    <div class="result-label">Years to FIRE</div>
+                    <div class="result-value" id="yearsToFire">0</div>
+                </div>
+                <div class="result-box">
+                    <div class="result-label">Total Contributions</div>
+                    <div class="result-value" id="totalContributions">$0</div>
+                </div>
+            </div>
+            
+            <p class="info-text">The 4% rule suggests you need 25x your annual expenses to retire safely.</p>
+        </div>
+        
+        <div class="grid-container">
+            <div class="card">
+                <h3 style="margin-bottom: 15px; color: #333;">Savings Growth Over Time</h3>
+                <div class="chart-container">
+                    <canvas id="growthChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 style="margin-bottom: 15px; color: #333;">Portfolio Composition</h3>
+                <div class="chart-container">
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let growthChart = null;
+        let pieChart = null;
+        
+        function formatCurrency(amount) {
+            return '$' + amount.toLocaleString('en-US', { maximumFractionDigits: 0 });
+        }
+        
+        function calculate() {
+            const monthlyExpenses = parseFloat(document.getElementById('monthlyExpenses').value);
+            const withdrawalRate = parseFloat(document.getElementById('withdrawalRate').value) / 100;
+            const currentSavings = parseFloat(document.getElementById('currentSavings').value);
+            const monthlySavings = parseFloat(document.getElementById('monthlySavings').value);
+            const expectedReturn = parseFloat(document.getElementById('expectedReturn').value) / 100;
+            
+            // Calculate FIRE number
+            const annualExpenses = monthlyExpenses * 12;
+            const fireNumber = annualExpenses / withdrawalRate;
+            
+            // Calculate years to FIRE with compound interest
+            let savings = currentSavings;
+            let months = 0;
+            const monthlyRate = expectedReturn / 12;
+            const maxMonths = 600; // 50 years max
+            
+            const savingsHistory = [currentSavings];
+            const contributionsHistory = [0];
+            const yearsLabels = [0];
+            
+            while (savings < fireNumber && months < maxMonths) {
+                months++;
+                savings = savings * (1 + monthlyRate) + monthlySavings;
+                
+                if (months % 12 === 0) {
+                    savingsHistory.push(savings);
+                    contributionsHistory.push(currentSavings + (monthlySavings * months));
+                    yearsLabels.push(months / 12);
+                }
+            }
+            
+            const yearsToFire = months / 12;
+            const totalContributions = currentSavings + (monthlySavings * months);
+            
+            // Update results
+            document.getElementById('fireNumber').textContent = formatCurrency(fireNumber);
+            document.getElementById('yearsToFire').textContent = yearsToFire.toFixed(1);
+            document.getElementById('totalContributions').textContent = formatCurrency(totalContributions);
+            document.getElementById('results').style.display = 'grid';
+            
+            // Update charts
+            updateGrowthChart(yearsLabels, savingsHistory, contributionsHistory, fireNumber);
+            updatePieChart(totalContributions, savings - totalContributions);
+        }
+        
+        function updateGrowthChart(labels, savings, contributions, fireNumber) {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            
+            if (growthChart) {
+                growthChart.destroy();
+            }
+            
+            growthChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Total Savings',
+                            data: savings,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Contributions',
+                            data: contributions,
+                            borderColor: '#764ba2',
+                            backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'FIRE Goal',
+                            data: Array(labels.length).fill(fireNumber),
+                            borderColor: '#f59e0b',
+                            borderDash: [5, 5],
+                            fill: false,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Years'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Amount ($)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value / 1000).toFixed(0) + 'k';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updatePieChart(contributions, growth) {
+            const ctx = document.getElementById('pieChart').getContext('2d');
+            
+            if (pieChart) {
+                pieChart.destroy();
+            }
+            
+            pieChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Contributions', 'Investment Growth'],
+                    datasets: [{
+                        data: [contributions, Math.max(0, growth)],
+                        backgroundColor: [
+                            '#764ba2',
+                            '#667eea'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = formatCurrency(context.parsed);
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return label + ': ' + value + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Calculate on page load
+        calculate();
+    </script>
+</body>
+</html>
