@@ -7,6 +7,7 @@ import LoanCalculator from '../../calculators/loanCalculator.js';
 import MortgageVsRentCalculator from '../../calculators/mortgageVsRentCalculator.js';
 import InvestmentPortfolioCalculator from '../../calculators/investmentPortfolioCalculator.js';
 import RetirementIncomeCalculator from '../../calculators/retirementIncomeCalculator.js';
+import TaxCalculator from '../../calculators/taxCalculator.js';
 
 const router = express.Router();
 const calculator = new FireCalculator();
@@ -17,6 +18,7 @@ const loanCalculator = new LoanCalculator();
 const mortgageVsRentCalculator = new MortgageVsRentCalculator();
 const portfolioCalculator = new InvestmentPortfolioCalculator();
 const retirementIncomeCalculator = new RetirementIncomeCalculator();
+const taxCalculator = new TaxCalculator();
 
 router.get('/savings-goal', (req, res) => {
     try {
@@ -425,6 +427,53 @@ router.post('/retirement/total-income', (req, res) => {
             Number(rentalIncome),
             Number(age),
             agePensionDetails
+        );
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// Tax Calculator Routes
+router.post('/tax/calculate', (req, res) => {
+    try {
+        const {
+            annualSalary,
+            includeSuperInPackage,
+            superRate,
+            preTaxDeductions,
+            postTaxDeductions
+        } = req.body;
+
+        const result = taxCalculator.calculateNetSalary(
+            Number(annualSalary),
+            includeSuperInPackage,
+            superRate ? Number(superRate) / 100 : undefined,
+            preTaxDeductions ? Number(preTaxDeductions) : undefined,
+            postTaxDeductions ? Number(postTaxDeductions) : undefined
+        );
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/tax/required-salary', (req, res) => {
+    try {
+        const { targetTakeHome } = req.body;
+        const result = taxCalculator.calculateRequiredGrossSalary(Number(targetTakeHome));
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/tax/salary-increase', (req, res) => {
+    try {
+        const { currentSalary, desiredTakeHomeIncrease } = req.body;
+        const result = taxCalculator.calculateRequiredSalaryIncrease(
+            Number(currentSalary),
+            Number(desiredTakeHomeIncrease)
         );
         res.json(result);
     } catch (error) {

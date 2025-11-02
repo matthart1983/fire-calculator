@@ -179,6 +179,9 @@
             <button onclick="showTab('retirement')" id="retirementTab" style="width: auto; padding: 12px 30px; background: transparent; color: white; border: 2px solid white;">
                 Retirement
             </button>
+            <button onclick="showTab('tax')" id="taxTab" style="width: auto; padding: 12px 30px; background: transparent; color: white; border: 2px solid white;">
+                Tax Calculator
+            </button>
         </div>
         
         <!-- FIRE Calculator Section -->
@@ -806,6 +809,119 @@
             </div>
         </div>
 
+        <!-- Tax Calculator Section -->
+        <div id="taxSection" style="display: none;">
+            <div class="card">
+                <h2 style="margin-bottom: 20px; color: #333;">Australian Tax Calculator</h2>
+                
+                <div class="input-group">
+                    <label for="annualSalary">Annual Salary ($)</label>
+                    <input type="number" id="annualSalary" placeholder="80000" value="80000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="superRate">Super Rate (%)</label>
+                    <input type="number" id="superRate" placeholder="11.5" value="11.5" step="0.5">
+                </div>
+                
+                <div class="input-group">
+                    <label>
+                        <input type="checkbox" id="includeSuperInPackage" style="width: auto; margin-right: 10px;">
+                        Super included in package
+                    </label>
+                </div>
+                
+                <div class="input-group">
+                    <label for="preTaxDeductions">Pre-Tax Deductions (annual) ($)</label>
+                    <input type="number" id="preTaxDeductions" placeholder="0" value="0">
+                    <small style="color: #666;">e.g., salary sacrifice, union fees</small>
+                </div>
+                
+                <div class="input-group">
+                    <label for="postTaxDeductions">Post-Tax Deductions (annual) ($)</label>
+                    <input type="number" id="postTaxDeductions" placeholder="0" value="0">
+                    <small style="color: #666;">e.g., child support, student loans</small>
+                </div>
+                
+                <button onclick="calculateTax()">Calculate Take-Home Pay</button>
+                
+                <div class="results" id="taxResults">
+                    <div class="result-box">
+                        <div class="result-label">Annual Take-Home</div>
+                        <div class="result-value" id="taxAnnualNet">$0</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Monthly Take-Home</div>
+                        <div class="result-value" id="taxMonthlyNet">$0</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Fortnightly Take-Home</div>
+                        <div class="result-value" id="taxFortnightlyNet">$0</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Total Tax</div>
+                        <div class="result-value" id="taxTotal">$0</div>
+                    </div>
+                </div>
+                
+                <div class="results" id="taxDetailsResults" style="margin-top: 20px;">
+                    <div class="result-box" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="result-label">Income Tax</div>
+                        <div class="result-value" id="taxIncomeTax">$0</div>
+                    </div>
+                    <div class="result-box" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="result-label">Medicare Levy</div>
+                        <div class="result-value" id="taxMedicareLevy">$0</div>
+                    </div>
+                    <div class="result-box" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <div class="result-label">LITO Offset</div>
+                        <div class="result-value" id="taxLITO">$0</div>
+                    </div>
+                    <div class="result-box" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <div class="result-label">Superannuation</div>
+                        <div class="result-value" id="taxSuper">$0</div>
+                    </div>
+                </div>
+                
+                <div class="results" id="taxRatesResults" style="margin-top: 20px;">
+                    <div class="result-box">
+                        <div class="result-label">Effective Tax Rate</div>
+                        <div class="result-value" id="taxEffectiveRate">0%</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Marginal Tax Rate</div>
+                        <div class="result-value" id="taxMarginalRate">0%</div>
+                    </div>
+                    <div class="result-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="result-label">Take-Home %</div>
+                        <div class="result-value" id="taxTakeHomePercent">0%</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Weekly Take-Home</div>
+                        <div class="result-value" id="taxWeeklyNet">$0</div>
+                    </div>
+                </div>
+                
+                <p class="info-text">Calculate your net salary using 2024-25 Australian tax rates including Medicare levy and LITO.</p>
+            </div>
+            
+            <div class="grid-container">
+                <div class="card">
+                    <h3 style="margin-bottom: 15px; color: #333;">Income Breakdown</h3>
+                    <div class="chart-container">
+                        <canvas id="taxBreakdownChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 style="margin-bottom: 15px; color: #333;">Tax Components</h3>
+                    <div class="chart-container">
+                        <canvas id="taxComponentsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
     
     <script>
@@ -985,6 +1101,7 @@
             const mortgageSection = document.getElementById('mortgageSection');
             const portfolioSection = document.getElementById('portfolioSection');
             const retirementSection = document.getElementById('retirementSection');
+            const taxSection = document.getElementById('taxSection');
             const fireTab = document.getElementById('fireTab');
             const superTab = document.getElementById('superTab');
             const networthTab = document.getElementById('networthTab');
@@ -993,6 +1110,7 @@
             const mortgageTab = document.getElementById('mortgageTab');
             const portfolioTab = document.getElementById('portfolioTab');
             const retirementTab = document.getElementById('retirementTab');
+            const taxTab = document.getElementById('taxTab');
             
             // Hide all sections
             fireSection.style.display = 'none';
@@ -1003,6 +1121,7 @@
             mortgageSection.style.display = 'none';
             portfolioSection.style.display = 'none';
             retirementSection.style.display = 'none';
+            taxSection.style.display = 'none';
             
             // Reset all tabs
             fireTab.style.background = 'transparent';
@@ -1021,6 +1140,8 @@
             portfolioTab.style.color = 'white';
             retirementTab.style.background = 'transparent';
             retirementTab.style.color = 'white';
+            taxTab.style.background = 'transparent';
+            taxTab.style.color = 'white';
             
             // Show selected tab
             if (tab === 'fire') {
@@ -1055,6 +1176,10 @@
                 retirementSection.style.display = 'block';
                 retirementTab.style.background = 'white';
                 retirementTab.style.color = '#667eea';
+            } else if (tab === 'tax') {
+                taxSection.style.display = 'block';
+                taxTab.style.background = 'white';
+                taxTab.style.color = '#667eea';
             }
         }
         
@@ -2104,6 +2229,168 @@
                             ticks: {
                                 callback: function(value) {
                                     return value.toFixed(1) + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Tax Calculator
+        let taxBreakdownChart = null;
+        let taxComponentsChart = null;
+
+        async function calculateTax() {
+            const annualSalary = parseFloat(document.getElementById('annualSalary').value);
+            const superRate = parseFloat(document.getElementById('superRate').value);
+            const includeSuperInPackage = document.getElementById('includeSuperInPackage').checked;
+            const preTaxDeductions = parseFloat(document.getElementById('preTaxDeductions').value) || 0;
+            const postTaxDeductions = parseFloat(document.getElementById('postTaxDeductions').value) || 0;
+
+            const response = await fetch('/api/tax/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    annualSalary,
+                    superRate,
+                    includeSuperInPackage,
+                    preTaxDeductions,
+                    postTaxDeductions
+                })
+            });
+
+            const data = await response.json();
+
+            // Update main results
+            document.getElementById('taxAnnualNet').textContent = formatCurrency(data.net.annualIncome);
+            document.getElementById('taxMonthlyNet').textContent = formatCurrency(data.net.monthlyIncome);
+            document.getElementById('taxFortnightlyNet').textContent = formatCurrency(data.net.fortnightlyIncome);
+            document.getElementById('taxTotal').textContent = formatCurrency(data.tax.totalTax);
+
+            // Update detail results
+            document.getElementById('taxIncomeTax').textContent = formatCurrency(data.tax.incomeTax);
+            document.getElementById('taxMedicareLevy').textContent = formatCurrency(data.tax.medicareLevy);
+            document.getElementById('taxLITO').textContent = formatCurrency(data.tax.lito);
+            document.getElementById('taxSuper').textContent = formatCurrency(data.superannuation.annual);
+
+            // Update rates
+            document.getElementById('taxEffectiveRate').textContent = data.tax.effectiveRate + '%';
+            document.getElementById('taxMarginalRate').textContent = data.tax.marginalRate + '%';
+            document.getElementById('taxTakeHomePercent').textContent = data.takeHomePercentage + '%';
+            document.getElementById('taxWeeklyNet').textContent = formatCurrency(data.net.weeklyIncome);
+
+            updateTaxBreakdownChart(data);
+            updateTaxComponentsChart(data);
+        }
+
+        function updateTaxBreakdownChart(data) {
+            const ctx = document.getElementById('taxBreakdownChart').getContext('2d');
+
+            if (taxBreakdownChart) {
+                taxBreakdownChart.destroy();
+            }
+
+            taxBreakdownChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Take-Home Pay', 'Income Tax', 'Medicare Levy', 'Superannuation'],
+                    datasets: [{
+                        data: [
+                            data.net.annualIncome,
+                            data.tax.incomeTax - data.tax.lito,
+                            data.tax.medicareLevy,
+                            data.superannuation.annual
+                        ],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = formatCurrency(context.parsed);
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return label + ': ' + value + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTaxComponentsChart(data) {
+            const ctx = document.getElementById('taxComponentsChart').getContext('2d');
+
+            if (taxComponentsChart) {
+                taxComponentsChart.destroy();
+            }
+
+            const taxComponents = [
+                data.tax.incomeTax - data.tax.lito,
+                data.tax.medicareLevy
+            ];
+
+            if (data.tax.lito > 0) {
+                taxComponents.push(-data.tax.lito);
+            }
+
+            const labels = ['Income Tax', 'Medicare Levy'];
+            if (data.tax.lito > 0) {
+                labels.push('LITO (Offset)');
+            }
+
+            taxComponentsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Tax Amount ($)',
+                        data: taxComponents,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(75, 192, 192, 0.8)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount ($)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value / 1000).toFixed(0) + 'k';
                                 }
                             }
                         }
