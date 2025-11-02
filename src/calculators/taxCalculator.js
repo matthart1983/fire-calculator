@@ -1,12 +1,12 @@
 class TaxCalculator {
     constructor() {
-        // 2024-25 Australian tax brackets
+        // 2024-25 Australian tax brackets (Stage 3 tax cuts)
         this.taxBrackets = [
             { min: 0, max: 18200, rate: 0, baseAmount: 0 },
-            { min: 18201, max: 45000, rate: 0.19, baseAmount: 0 },
-            { min: 45001, max: 120000, rate: 0.325, baseAmount: 5092 },
-            { min: 120001, max: 180000, rate: 0.37, baseAmount: 29467 },
-            { min: 180001, max: Infinity, rate: 0.45, baseAmount: 51667 }
+            { min: 18201, max: 45000, rate: 0.16, baseAmount: 0 },
+            { min: 45001, max: 135000, rate: 0.30, baseAmount: 4288 },
+            { min: 135001, max: 190000, rate: 0.37, baseAmount: 31288 },
+            { min: 190001, max: Infinity, rate: 0.45, baseAmount: 51638 }
         ];
 
         // Medicare levy
@@ -14,11 +14,13 @@ class TaxCalculator {
         this.medicareThreshold = 24276; // Single, no dependents
         
         // Low and Middle Income Tax Offset (LMITO) - ended 2021-22
-        // Low Income Tax Offset (LITO)
+        // Low Income Tax Offset (LITO) - 2024-25
         this.litoMax = 700;
-        this.litoThreshold = 37500;
-        this.litoPhaseOutRate = 0.05;
-        this.litoPhaseOutEnd = 66667;
+        this.litoPhase1Start = 37500;
+        this.litoPhase1End = 45000;
+        this.litoPhase1Rate = 0.05;
+        this.litoPhase2Rate = 0.015;
+        this.litoPhase2End = 66667;
     }
 
     /**
@@ -30,9 +32,15 @@ class TaxCalculator {
         let tax = 0;
 
         for (const bracket of this.taxBrackets) {
-            if (annualIncome > bracket.min) {
-                const taxableInBracket = Math.min(annualIncome, bracket.max) - bracket.min + 1;
+            if (annualIncome > bracket.max) {
+                // Income exceeds this bracket, apply full bracket tax
+                const taxableInBracket = bracket.max - bracket.min;
                 tax = bracket.baseAmount + (taxableInBracket * bracket.rate);
+            } else if (annualIncome >= bracket.min) {
+                // Income falls within this bracket
+                const taxableInBracket = annualIncome - bracket.min;
+                tax = bracket.baseAmount + (taxableInBracket * bracket.rate);
+                break; // Found the correct bracket
             }
         }
 
@@ -45,11 +53,20 @@ class TaxCalculator {
      * @returns {number} LITO offset amount
      */
     calculateLITO(annualIncome) {
-        if (annualIncome <= this.litoThreshold) {
+        if (annualIncome <= this.litoPhase1Start) {
+            // Full LITO
             return this.litoMax;
-        } else if (annualIncome < this.litoPhaseOutEnd) {
-            const reduction = (annualIncome - this.litoThreshold) * this.litoPhaseOutRate;
+        } else if (annualIncome <= this.litoPhase1End) {
+            // Phase 1: Reduce by 5c per dollar from $37,500 to $45,000
+            const reduction = (annualIncome - this.litoPhase1Start) * this.litoPhase1Rate;
             return Math.max(0, this.litoMax - reduction);
+        } else if (annualIncome <= this.litoPhase2End) {
+            // Phase 2: Reduce by 1.5c per dollar from $45,000 to $66,667
+            // At $45,000, LITO is $700 - ($7,500 * 0.05) = $325
+            const phase1Reduction = (this.litoPhase1End - this.litoPhase1Start) * this.litoPhase1Rate;
+            const litoAt45k = this.litoMax - phase1Reduction;
+            const phase2Reduction = (annualIncome - this.litoPhase1End) * this.litoPhase2Rate;
+            return Math.max(0, litoAt45k - phase2Reduction);
         }
         return 0;
     }

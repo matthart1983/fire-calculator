@@ -843,20 +843,30 @@
                     <small style="color: #666;">e.g., child support, student loans</small>
                 </div>
                 
+                <div class="input-group">
+                    <label for="payFrequency">Display Pay Frequency</label>
+                    <select id="payFrequency" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
+                        <option value="annual">Annual</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="fortnightly" selected>Fortnightly</option>
+                        <option value="weekly">Weekly</option>
+                    </select>
+                </div>
+                
                 <button onclick="calculateTax()">Calculate Take-Home Pay</button>
                 
                 <div class="results" id="taxResults">
+                    <div class="result-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="result-label" id="taxMainLabel">Fortnightly Take-Home</div>
+                        <div class="result-value" id="taxMainNet" style="font-size: 36px;">$0</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Annual Gross</div>
+                        <div class="result-value" id="taxAnnualGross">$0</div>
+                    </div>
                     <div class="result-box">
                         <div class="result-label">Annual Take-Home</div>
                         <div class="result-value" id="taxAnnualNet">$0</div>
-                    </div>
-                    <div class="result-box">
-                        <div class="result-label">Monthly Take-Home</div>
-                        <div class="result-value" id="taxMonthlyNet">$0</div>
-                    </div>
-                    <div class="result-box">
-                        <div class="result-label">Fortnightly Take-Home</div>
-                        <div class="result-value" id="taxFortnightlyNet">$0</div>
                     </div>
                     <div class="result-box">
                         <div class="result-label">Total Tax</div>
@@ -892,13 +902,13 @@
                         <div class="result-label">Marginal Tax Rate</div>
                         <div class="result-value" id="taxMarginalRate">0%</div>
                     </div>
-                    <div class="result-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="result-box">
                         <div class="result-label">Take-Home %</div>
                         <div class="result-value" id="taxTakeHomePercent">0%</div>
                     </div>
                     <div class="result-box">
-                        <div class="result-label">Weekly Take-Home</div>
-                        <div class="result-value" id="taxWeeklyNet">$0</div>
+                        <div class="result-label">Taxable Income</div>
+                        <div class="result-value" id="taxTaxableIncome">$0</div>
                     </div>
                 </div>
                 
@@ -2247,6 +2257,7 @@
             const includeSuperInPackage = document.getElementById('includeSuperInPackage').checked;
             const preTaxDeductions = parseFloat(document.getElementById('preTaxDeductions').value) || 0;
             const postTaxDeductions = parseFloat(document.getElementById('postTaxDeductions').value) || 0;
+            const payFrequency = document.getElementById('payFrequency').value;
 
             const response = await fetch('/api/tax/calculate', {
                 method: 'POST',
@@ -2264,10 +2275,36 @@
 
             const data = await response.json();
 
-            // Update main results
+            // Determine which value to display based on frequency
+            let mainNetValue, mainGrossValue, mainLabel;
+            switch(payFrequency) {
+                case 'annual':
+                    mainNetValue = data.net.annualIncome;
+                    mainGrossValue = data.gross.annualSalary;
+                    mainLabel = 'Annual Take-Home';
+                    break;
+                case 'monthly':
+                    mainNetValue = data.net.monthlyIncome;
+                    mainGrossValue = data.gross.monthlySalary;
+                    mainLabel = 'Monthly Take-Home';
+                    break;
+                case 'fortnightly':
+                    mainNetValue = data.net.fortnightlyIncome;
+                    mainGrossValue = data.gross.fortnightlySalary;
+                    mainLabel = 'Fortnightly Take-Home';
+                    break;
+                case 'weekly':
+                    mainNetValue = data.net.weeklyIncome;
+                    mainGrossValue = data.gross.weeklySalary;
+                    mainLabel = 'Weekly Take-Home';
+                    break;
+            }
+
+            // Update main results with selected frequency
+            document.getElementById('taxMainLabel').textContent = mainLabel;
+            document.getElementById('taxMainNet').textContent = formatCurrency(mainNetValue);
+            document.getElementById('taxAnnualGross').textContent = formatCurrency(data.gross.annualSalary);
             document.getElementById('taxAnnualNet').textContent = formatCurrency(data.net.annualIncome);
-            document.getElementById('taxMonthlyNet').textContent = formatCurrency(data.net.monthlyIncome);
-            document.getElementById('taxFortnightlyNet').textContent = formatCurrency(data.net.fortnightlyIncome);
             document.getElementById('taxTotal').textContent = formatCurrency(data.tax.totalTax);
 
             // Update detail results
@@ -2280,7 +2317,7 @@
             document.getElementById('taxEffectiveRate').textContent = data.tax.effectiveRate + '%';
             document.getElementById('taxMarginalRate').textContent = data.tax.marginalRate + '%';
             document.getElementById('taxTakeHomePercent').textContent = data.takeHomePercentage + '%';
-            document.getElementById('taxWeeklyNet').textContent = formatCurrency(data.net.weeklyIncome);
+            document.getElementById('taxTaxableIncome').textContent = formatCurrency(data.taxableIncome);
 
             updateTaxBreakdownChart(data);
             updateTaxComponentsChart(data);
