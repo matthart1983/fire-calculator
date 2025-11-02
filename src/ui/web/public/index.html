@@ -510,8 +510,8 @@
                 </div>
                 
                 <div class="input-group">
-                    <label for="loanRate">Annual Interest Rate (%)</label>
-                    <input type="number" id="loanRate" placeholder="5.5" value="5.5" step="0.1">
+                    <label for="loanInterestRate">Annual Interest Rate (%)</label>
+                    <input type="number" id="loanInterestRate" placeholder="5.5" value="5.5" step="0.1">
                 </div>
                 
                 <div class="input-group">
@@ -520,8 +520,8 @@
                 </div>
                 
                 <div class="input-group">
-                    <label for="paymentFreq">Payment Frequency</label>
-                    <select id="paymentFreq" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
+                    <label for="paymentFrequency">Payment Frequency</label>
+                    <select id="paymentFrequency" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
                         <option value="weekly">Weekly</option>
                         <option value="fortnightly">Fortnightly</option>
                         <option value="monthly" selected>Monthly</option>
@@ -530,22 +530,22 @@
                 
                 <button onclick="calculateLoan()">Calculate Loan</button>
                 
-                <div class="results" id="loanResults" style="display: none;">
+                <div class="results" id="loanResults">
                     <div class="result-box">
                         <div class="result-label">Payment Amount</div>
-                        <div class="result-value" id="loanPayment">$0</div>
+                        <div class="result-value" id="loanPaymentAmount">$0</div>
                     </div>
                     <div class="result-box">
-                        <div class="result-label">Total Paid</div>
-                        <div class="result-value" id="loanTotalPaid">$0</div>
+                        <div class="result-label">Total Payments</div>
+                        <div class="result-value" id="loanTotalPayments">$0</div>
                     </div>
                     <div class="result-box" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
                         <div class="result-label">Total Interest</div>
                         <div class="result-value" id="loanTotalInterest">$0</div>
                     </div>
                     <div class="result-box">
-                        <div class="result-label">Total Payments</div>
-                        <div class="result-value" id="loanTotalPayments">0</div>
+                        <div class="result-label">Total Cost</div>
+                        <div class="result-value" id="loanTotalCost">$0</div>
                     </div>
                 </div>
                 
