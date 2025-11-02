@@ -1,9 +1,15 @@
 # FIRE Calculator
 
+🔥 **Live Demo: [https://firec-calc.up.railway.app](https://firec-calc.up.railway.app)**
+
 ## Overview
 The FIRE (Financial Independence, Retire Early) Calculator is a web and CLI application designed to help users calculate their savings goals and withdrawal rates for achieving financial independence and early retirement. 
 
 ## Features
+- Interactive web interface with real-time calculations
+- Beautiful data visualizations with Chart.js
+- Savings growth projection over time
+- Portfolio composition breakdown
 - Calculate savings goals based on desired retirement age and expenses.
 - Determine safe withdrawal rates to ensure sustainable income during retirement.
 - Manage and evaluate financial portfolios, including investments and expenses.
