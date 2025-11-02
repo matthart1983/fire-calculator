@@ -3,12 +3,14 @@ import FireCalculator from '../../calculators/fireCalculator.js';
 import SuperannuationCalculator from '../../calculators/superannuationCalculator.js';
 import NetWorthCalculator from '../../calculators/netWorthCalculator.js';
 import SavingsCalculator from '../../calculators/savingsCalculator.js';
+import LoanCalculator from '../../calculators/loanCalculator.js';
 
 const router = express.Router();
 const calculator = new FireCalculator();
 const superCalculator = new SuperannuationCalculator();
 const netWorthCalculator = new NetWorthCalculator();
 const savingsCalculator = new SavingsCalculator();
+const loanCalculator = new LoanCalculator();
 
 router.get('/savings-goal', (req, res) => {
     try {
@@ -154,6 +156,52 @@ router.post('/savings/required-contribution', (req, res) => {
             Number(annualInterestRate) / 100
         );
         res.json({ requiredContribution });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/loan/calculate', (req, res) => {
+    try {
+        const { loanAmount, annualInterestRate, loanTermYears, paymentFrequency } = req.body;
+        const result = loanCalculator.calculateLoanRepayment(
+            Number(loanAmount),
+            Number(annualInterestRate) / 100,
+            Number(loanTermYears),
+            paymentFrequency || 'monthly'
+        );
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/loan/borrowing-capacity', (req, res) => {
+    try {
+        const { desiredPayment, annualInterestRate, loanTermYears, paymentFrequency } = req.body;
+        const capacity = loanCalculator.calculateBorrowingCapacity(
+            Number(desiredPayment),
+            Number(annualInterestRate) / 100,
+            Number(loanTermYears),
+            paymentFrequency || 'monthly'
+        );
+        res.json({ borrowingCapacity: capacity });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/loan/extra-payment-impact', (req, res) => {
+    try {
+        const { loanAmount, annualInterestRate, loanTermYears, extraPayment, paymentFrequency } = req.body;
+        const result = loanCalculator.calculateExtraPaymentImpact(
+            Number(loanAmount),
+            Number(annualInterestRate) / 100,
+            Number(loanTermYears),
+            Number(extraPayment),
+            paymentFrequency || 'monthly'
+        );
+        res.json(result);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
