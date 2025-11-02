@@ -1,7 +1,7 @@
 {
-  "name": "fire-calculator",
+  "name": "financeflow",
   "version": "1.0.0",
-  "description": "A financial independence retire early (FIRE) calculator application.",
+  "description": "FinanceFlow - A comprehensive financial planning and calculator application.",
   "main": "src/ui/web/app.js",
   "type": "module",
   "scripts": {
@@ -19,10 +19,13 @@
     "prettier": "^2.5.1"
   },
   "keywords": [
+    "finance",
+    "financial planning",
     "FIRE",
-    "financial independence",
     "retirement",
-    "calculator"
+    "calculator",
+    "tax calculator",
+    "superannuation"
   ],
   "author": "Your Name",
   "license": "MIT"

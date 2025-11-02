@@ -1,9 +1,9 @@
-# FIRE Calculator
+# FinanceFlow
 
-🔥 **Live Demo: [https://firec-calc.up.railway.app](https://firec-calc.up.railway.app)**
+� **Live Demo: [https://firec-calc.up.railway.app](https://firec-calc.up.railway.app)**
 
 ## Overview
-The FIRE (Financial Independence, Retire Early) Calculator is a web and CLI application designed to help users calculate their savings goals and withdrawal rates for achieving financial independence and early retirement. 
+FinanceFlow is a comprehensive financial planning web application designed to help users make informed decisions about savings, retirement, investments, taxes, and loans. Calculate your path to financial independence with multiple specialized calculators and beautiful visualizations. 
 
 ## Features
 - Interactive web interface with real-time calculations
@@ -13,9 +13,19 @@ The FIRE (Financial Independence, Retire Early) Calculator is a web and CLI appl
 - Determine safe withdrawal rates to ensure sustainable income during retirement.
 - User-friendly command-line interface and web application.
 
+## Calculators Included
+- **FIRE Calculator** - Financial Independence, Retire Early planning
+- **Superannuation Calculator** - Australian retirement savings projections
+- **Net Worth Calculator** - Track assets and liabilities
+- **Savings Calculator** - Compound interest and growth projections
+- **Loan Calculator** - Repayment schedules and borrowing capacity
+- **Mortgage vs Rent** - Compare buying vs renting costs
+- **Retirement Income** - Safe withdrawal rates and age pension estimates
+- **Tax Calculator** - Australian tax calculations with 2024-25 rates
+
 ## Project Structure
 ```
-fire-calculator
+financeflow
 ├── src
 │   ├── index.js               # Entry point of the application
 │   ├── calculators
@@ -38,31 +48,31 @@ fire-calculator
 
 ## Installation
 1. Clone the repository:
-   ```
-   git clone <repository-url>
+   ```bash
+   git clone https://github.com/matthart1983/fire-calculator.git
    ```
 2. Navigate to the project directory:
-   ```
+   ```bash
    cd fire-calculator
    ```
 3. Install the dependencies:
-   ```
+   ```bash
    npm install
    ```
 
 ## Usage
-### CLI
-To use the CLI version of the FIRE calculator, run:
+### Web Application (Recommended)
+Start the web application:
+```bash
+npm start
 ```
-node src/ui/cli.js
-```
+Then navigate to `http://localhost:3000` in your web browser.
 
-### Web
-To start the web application, run:
+### CLI
+To use the CLI version:
+```bash
+npm run cli
 ```
-node src/ui/web/app.js
-```
-Then, navigate to `http://localhost:3000` in your web browser.
 
 ## Contributing
 Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
