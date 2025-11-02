@@ -1,6 +1,6 @@
 # FinanceFlow
 
-� **Live Demo: [https://firec-calc.up.railway.app](https://firec-calc.up.railway.app)**
+💰 **Live Demo: [https://financeflow.up.railway.app](https://financeflow.up.railway.app)**
 
 ## Overview
 FinanceFlow is a comprehensive financial planning web application designed to help users make informed decisions about savings, retirement, investments, taxes, and loans. Calculate your path to financial independence with multiple specialized calculators and beautiful visualizations. 
