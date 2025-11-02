@@ -5,7 +5,6 @@ import NetWorthCalculator from '../../calculators/netWorthCalculator.js';
 import SavingsCalculator from '../../calculators/savingsCalculator.js';
 import LoanCalculator from '../../calculators/loanCalculator.js';
 import MortgageVsRentCalculator from '../../calculators/mortgageVsRentCalculator.js';
-import InvestmentPortfolioCalculator from '../../calculators/investmentPortfolioCalculator.js';
 import RetirementIncomeCalculator from '../../calculators/retirementIncomeCalculator.js';
 import TaxCalculator from '../../calculators/taxCalculator.js';
 
@@ -16,7 +15,6 @@ const netWorthCalculator = new NetWorthCalculator();
 const savingsCalculator = new SavingsCalculator();
 const loanCalculator = new LoanCalculator();
 const mortgageVsRentCalculator = new MortgageVsRentCalculator();
-const portfolioCalculator = new InvestmentPortfolioCalculator();
 const retirementIncomeCalculator = new RetirementIncomeCalculator();
 const taxCalculator = new TaxCalculator();
 
@@ -262,89 +260,7 @@ router.post('/mortgage-vs-rent/affordability', (req, res) => {
     }
 });
 
-// Investment Portfolio Calculator Routes
-router.post('/portfolio/growth', (req, res) => {
-    try {
-        const {
-            initialInvestment,
-            monthlyContribution,
-            allocation,
-            expectedReturns,
-            years,
-            inflationRate
-        } = req.body;
-
-        const result = portfolioCalculator.calculatePortfolioGrowth(
-            Number(initialInvestment),
-            Number(monthlyContribution),
-            allocation,
-            expectedReturns,
-            years ? Number(years) : undefined,
-            inflationRate ? Number(inflationRate) / 100 : undefined
-        );
-        res.json(result);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
-
-router.post('/portfolio/optimize-allocation', (req, res) => {
-    try {
-        const { age, retirementAge, riskTolerance } = req.body;
-        const result = portfolioCalculator.optimizeAllocation(
-            Number(age),
-            Number(retirementAge),
-            riskTolerance
-        );
-        res.json(result);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
-
-router.post('/portfolio/rebalance', (req, res) => {
-    try {
-        const { currentAllocation, targetAllocation } = req.body;
-        const result = portfolioCalculator.calculateRebalancing(
-            currentAllocation,
-            targetAllocation
-        );
-        res.json(result);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
-
-router.post('/portfolio/tax-efficient-withdrawal', (req, res) => {
-    try {
-        const { portfolioValue, annualWithdrawal, allocation, capitalGainsTaxRate } = req.body;
-        const result = portfolioCalculator.calculateTaxEfficientWithdrawal(
-            Number(portfolioValue),
-            Number(annualWithdrawal),
-            allocation,
-            capitalGainsTaxRate ? Number(capitalGainsTaxRate) / 100 : undefined
-        );
-        res.json(result);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
-
-router.post('/portfolio/dca-vs-lumpsum', (req, res) => {
-    try {
-        const { totalAmount, monthlyAmount, expectedReturn, volatility, years } = req.body;
-        const result = portfolioCalculator.calculateDCAvsLumpSum(
-            Number(totalAmount),
-            Number(monthlyAmount),
-            expectedReturn ? Number(expectedReturn) / 100 : undefined,
-            volatility ? Number(volatility) / 100 : undefined,
-            years ? Number(years) : undefined
-        );
-        res.json(result);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
+// (Investment Portfolio calculator removed)
 
 // Retirement Income Calculator Routes
 router.post('/retirement/safe-withdrawal', (req, res) => {

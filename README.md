@@ -9,10 +9,8 @@ The FIRE (Financial Independence, Retire Early) Calculator is a web and CLI appl
 - Interactive web interface with real-time calculations
 - Beautiful data visualizations with Chart.js
 - Savings growth projection over time
-- Portfolio composition breakdown
 - Calculate savings goals based on desired retirement age and expenses.
 - Determine safe withdrawal rates to ensure sustainable income during retirement.
-- Manage and evaluate financial portfolios, including investments and expenses.
 - User-friendly command-line interface and web application.
 
 ## Project Structure
@@ -23,7 +21,6 @@ fire-calculator
 │   ├── calculators
 │   │   └── fireCalculator.js   # Contains the FireCalculator class
 │   ├── models
-│   │   └── portfolio.js        # Contains the Portfolio class
 │   ├── utils
 │   │   └── finance.js          # Utility functions for financial calculations
 │   └── ui

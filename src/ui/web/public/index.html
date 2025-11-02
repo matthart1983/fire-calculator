@@ -173,9 +173,6 @@
             <button onclick="showTab('mortgage')" id="mortgageTab" style="width: auto; padding: 12px 30px; background: transparent; color: white; border: 2px solid white;">
                 Buy vs Rent
             </button>
-            <button onclick="showTab('portfolio')" id="portfolioTab" style="width: auto; padding: 12px 30px; background: transparent; color: white; border: 2px solid white;">
-                Portfolio
-            </button>
             <button onclick="showTab('retirement')" id="retirementTab" style="width: auto; padding: 12px 30px; background: transparent; color: white; border: 2px solid white;">
                 Retirement
             </button>
@@ -657,86 +654,7 @@
             </div>
         </div>
 
-        <!-- Investment Portfolio Calculator Section -->
-        <div id="portfolioSection" style="display: none;">
-            <div class="card">
-                <h2 style="margin-bottom: 20px; color: #333;">Investment Portfolio Calculator</h2>
-                
-                <div class="input-group">
-                    <label for="initialInvestment">Initial Investment ($)</label>
-                    <input type="number" id="initialInvestment" placeholder="50000" value="50000">
-                </div>
-                
-                <div class="input-group">
-                    <label for="monthlyContribution">Monthly Contribution ($)</label>
-                    <input type="number" id="monthlyContribution" placeholder="2000" value="2000">
-                </div>
-                
-                <div class="input-group">
-                    <label for="investmentYears">Investment Period (years)</label>
-                    <input type="number" id="investmentYears" placeholder="30" value="30">
-                </div>
-                
-                <div class="input-group">
-                    <label for="stocksAllocation">Stocks Allocation (%)</label>
-                    <input type="number" id="stocksAllocation" placeholder="60" value="60" min="0" max="100">
-                </div>
-                
-                <div class="input-group">
-                    <label for="bondsAllocation">Bonds Allocation (%)</label>
-                    <input type="number" id="bondsAllocation" placeholder="30" value="30" min="0" max="100">
-                </div>
-                
-                <div class="input-group">
-                    <label for="propertyAllocation">Property Allocation (%)</label>
-                    <input type="number" id="propertyAllocation" placeholder="5" value="5" min="0" max="100">
-                </div>
-                
-                <div class="input-group">
-                    <label for="cashAllocation">Cash Allocation (%)</label>
-                    <input type="number" id="cashAllocation" placeholder="5" value="5" min="0" max="100">
-                </div>
-                
-                <button onclick="calculatePortfolio()">Calculate Portfolio Growth</button>
-                
-                <div class="results" id="portfolioResults">
-                    <div class="result-box">
-                        <div class="result-label">Final Portfolio Value</div>
-                        <div class="result-value" id="portfolioFinalValue">$0</div>
-                    </div>
-                    <div class="result-box">
-                        <div class="result-label">Total Contributions</div>
-                        <div class="result-value" id="portfolioTotalContributions">$0</div>
-                    </div>
-                    <div class="result-box" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
-                        <div class="result-label">Total Gains</div>
-                        <div class="result-value" id="portfolioTotalGains">$0</div>
-                    </div>
-                    <div class="result-box">
-                        <div class="result-label">Weighted Return</div>
-                        <div class="result-value" id="portfolioWeightedReturn">0%</div>
-                    </div>
-                </div>
-                
-                <p class="info-text">Project your investment portfolio growth with diversified asset allocation.</p>
-            </div>
-            
-            <div class="grid-container">
-                <div class="card">
-                    <h3 style="margin-bottom: 15px; color: #333;">Portfolio Growth Over Time</h3>
-                    <div class="chart-container">
-                        <canvas id="portfolioGrowthChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <h3 style="margin-bottom: 15px; color: #333;">Asset Allocation</h3>
-                    <div class="chart-container">
-                        <canvas id="portfolioAllocationChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- (Investment Portfolio calculator removed) -->
 
         <!-- Retirement Income Calculator Section -->
         <div id="retirementSection" style="display: none;">
@@ -1097,7 +1015,6 @@
             const savingsSection = document.getElementById('savingsSection');
             const loanSection = document.getElementById('loanSection');
             const mortgageSection = document.getElementById('mortgageSection');
-            const portfolioSection = document.getElementById('portfolioSection');
             const retirementSection = document.getElementById('retirementSection');
             const taxSection = document.getElementById('taxSection');
             const fireTab = document.getElementById('fireTab');
@@ -1106,7 +1023,6 @@
             const savingsTab = document.getElementById('savingsTab');
             const loanTab = document.getElementById('loanTab');
             const mortgageTab = document.getElementById('mortgageTab');
-            const portfolioTab = document.getElementById('portfolioTab');
             const retirementTab = document.getElementById('retirementTab');
             const taxTab = document.getElementById('taxTab');
             
@@ -1117,7 +1033,6 @@
             savingsSection.style.display = 'none';
             loanSection.style.display = 'none';
             mortgageSection.style.display = 'none';
-            portfolioSection.style.display = 'none';
             retirementSection.style.display = 'none';
             taxSection.style.display = 'none';
             
@@ -1134,8 +1049,6 @@
             loanTab.style.color = 'white';
             mortgageTab.style.background = 'transparent';
             mortgageTab.style.color = 'white';
-            portfolioTab.style.background = 'transparent';
-            portfolioTab.style.color = 'white';
             retirementTab.style.background = 'transparent';
             retirementTab.style.color = 'white';
             taxTab.style.background = 'transparent';
@@ -1166,10 +1079,6 @@
                 mortgageSection.style.display = 'block';
                 mortgageTab.style.background = 'white';
                 mortgageTab.style.color = '#667eea';
-            } else if (tab === 'portfolio') {
-                portfolioSection.style.display = 'block';
-                portfolioTab.style.background = 'white';
-                portfolioTab.style.color = '#667eea';
             } else if (tab === 'retirement') {
                 retirementSection.style.display = 'block';
                 retirementTab.style.background = 'white';
@@ -1916,156 +1825,7 @@
             });
         }
 
-        // Investment Portfolio Calculator
-        let portfolioGrowthChart = null;
-        let portfolioAllocationChart = null;
-
-        async function calculatePortfolio() {
-            const initialInvestment = parseFloat(document.getElementById('initialInvestment').value);
-            const monthlyContribution = parseFloat(document.getElementById('monthlyContribution').value);
-            const years = parseFloat(document.getElementById('investmentYears').value);
-            const stocks = parseFloat(document.getElementById('stocksAllocation').value) / 100;
-            const bonds = parseFloat(document.getElementById('bondsAllocation').value) / 100;
-            const property = parseFloat(document.getElementById('propertyAllocation').value) / 100;
-            const cash = parseFloat(document.getElementById('cashAllocation').value) / 100;
-
-            const response = await fetch('/api/portfolio/growth', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    initialInvestment,
-                    monthlyContribution,
-                    years,
-                    allocation: { stocks, bonds, property, cash }
-                })
-            });
-
-            const data = await response.json();
-
-            document.getElementById('portfolioFinalValue').textContent = formatCurrency(data.finalValue);
-            document.getElementById('portfolioTotalContributions').textContent = formatCurrency(data.totalContributions);
-            document.getElementById('portfolioTotalGains').textContent = formatCurrency(data.totalGains);
-            document.getElementById('portfolioWeightedReturn').textContent = data.weightedReturn + '%';
-
-            updatePortfolioGrowthChart(data.timeline);
-            updatePortfolioAllocationChart(stocks, bonds, property, cash, data.finalValue);
-        }
-
-        function updatePortfolioGrowthChart(timeline) {
-            const ctx = document.getElementById('portfolioGrowthChart').getContext('2d');
-            
-            const years = timeline.map(item => item.year);
-            const portfolioValues = timeline.map(item => item.portfolioValue);
-            const contributions = timeline.map(item => item.totalContributions);
-
-            if (portfolioGrowthChart) {
-                portfolioGrowthChart.destroy();
-            }
-
-            portfolioGrowthChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: years,
-                    datasets: [
-                        {
-                            label: 'Portfolio Value',
-                            data: portfolioValues,
-                            borderColor: 'rgba(17, 153, 142, 1)',
-                            backgroundColor: 'rgba(17, 153, 142, 0.1)',
-                            fill: true
-                        },
-                        {
-                            label: 'Total Contributions',
-                            data: contributions,
-                            borderColor: 'rgba(56, 239, 125, 1)',
-                            backgroundColor: 'rgba(56, 239, 125, 0.1)',
-                            fill: true
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Years'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Amount ($)'
-                            },
-                            ticks: {
-                                callback: function(value) {
-                                    return '$' + (value / 1000).toFixed(0) + 'k';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function updatePortfolioAllocationChart(stocks, bonds, property, cash, totalValue) {
-            const ctx = document.getElementById('portfolioAllocationChart').getContext('2d');
-
-            if (portfolioAllocationChart) {
-                portfolioAllocationChart.destroy();
-            }
-
-            portfolioAllocationChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Stocks', 'Bonds', 'Property', 'Cash'],
-                    datasets: [{
-                        data: [
-                            totalValue * stocks,
-                            totalValue * bonds,
-                            totalValue * property,
-                            totalValue * cash
-                        ],
-                        backgroundColor: [
-                            'rgba(54, 162, 235, 0.8)',
-                            'rgba(255, 206, 86, 0.8)',
-                            'rgba(75, 192, 192, 0.8)',
-                            'rgba(153, 102, 255, 0.8)'
-                        ],
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const label = context.label || '';
-                                    const value = formatCurrency(context.parsed);
-                                    const percentage = (context.parsed / totalValue * 100).toFixed(1);
-                                    return label + ': ' + value + ' (' + percentage + '%)';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
+        // (Investment Portfolio Calculator JS functions removed)
 
         // Retirement Income Calculator
         let retirementDepletionChart = null;
