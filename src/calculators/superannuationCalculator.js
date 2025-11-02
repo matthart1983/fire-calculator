@@ -3,7 +3,7 @@ class SuperannuationCalculator {
         // Default superannuation guarantee rate (as of 2025)
         this.defaultSGRate = 0.115; // 11.5%
         // Tax rates for superannuation
-        this.contributionsTaxRate = 0.12; // 12% on concessional contributions
+        this.contributionsTaxRate = 0.15; // 15% on concessional contributions
         this.earningsTaxRate = 0.15; // 15% on fund earnings
         this.medicareLevyRate = 0.02; // 2% Medicare levy
     }
